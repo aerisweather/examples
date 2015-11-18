@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Aeris GeoJSon / Leaflet Example</title>
+
+    <!-- Include the leaflet style sheets and javascript library //-->
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
+    <script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
+
+    <!-- include the jquery library for the ajax call //-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+
+    <style>
+        body,html { margin:0; padding: 0;width:100%;height:100%;}
+        #map { width:100%; height: 100%; }
+    </style>
+</head>
+<body>
+<div id="map"></div>
+
+<script>
+    /*
+     Quick example of adding storm reports geojson to map as circle markers.
+     */
+
+    // create the leaflet map
+    var map = L.map('map').setView([44.96,-93.27], 5);
+
+    // add an OSM baselayer
+    L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+        attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a>',
+        maxZoom: 18,
+        id: 'your.mapbox.project.id',
+        accessToken: 'your.mapbox.public.access.token'
+    }).addTo(map);
+
+    // API query for past  12 hours of storm reports.
+    // Update with your client_id and secret
+    var stormReportsUrl = 'http://api.aerisapi.com/stormreports/within?p=0,-180,90,180&from=-12hours&limit=500&format=geojson&client_id=CLIENTIDHERE&client_secret=SECRETHERE';
+
+    // Use jquery to perform the API call, then add the features to the map
+    // as circle markers. Since no styling is provided, it will be default.
+    var stormReportsLayer = null;
+    $.ajax({
+        'dataType': "json",
+        'url': stormReportsUrl,
+        'success': function (data) {
+            if (data['features']) {
+                stormReportsLayer = L.geoJson(data.features,{
+                    'pointToLayer': function (feature, latlng) {
+                        return L.circleMarker(latlng, {
+                            radius: 5,
+                            color: '#444',
+                            fillColor: '#6dd'
+                        });
+                    }
+                });
+                stormReportsLayer.addTo(map);
+
+            }
+            else {
+                console.log('Error fetching ' + stormReportsUrl)
+            }
+        }
+    }).error(function () {
+        console.log('error loading StormCellSummary');
+    });
+
+    </script>
+</body>
+</html>
