@@ -16,7 +16,7 @@ var stormReportColorScale = d3.scale.ordinal().domain(["Avalanche", "Blizzard", 
     .range(["#89c1ef", "#6800e6", "#138b00", "#767676", "#e700e5", "#77e3f7", "#8c8c8c", "#45e300", "#2379f0", "#51dc97", "#d10000", "#ded000", '#07fff3', '#767676', '#e4087d', '#555c69']);
 
 
-// define the charts
+// initialize the charts
 var dataCountChart = dc.dataCount('#dc-datacount');
 var catRowChart = dc.rowChart('#dc-cat-chart');
 var stateChart = dc.geoChoroplethChart('#dc-state-chart');
@@ -59,7 +59,7 @@ function createCharts(error, us, data) {
 
     // create dimensions and groups
 
-    // report categories.
+    // report categories
     var reportCat = facts.dimension(function (d) {
         return d.cat;
     });
@@ -193,5 +193,6 @@ function createCharts(error, us, data) {
     hourChart.yAxis().ticks(5);
     hourChart.xAxis().ticks(24);
 
+    // Draw the charts!
     dc.renderAll();
 }
