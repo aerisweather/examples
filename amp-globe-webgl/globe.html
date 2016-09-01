@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Aeris Maps Platform - WebGL Globe Example</title>
+
+    <script src="http://www.webglearth.com/v2/api.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.1/jquery.min.js"></script>
+
+    <style>
+        body,html { margin:0; padding: 0;width:100%;height:100%; background-color: black;}
+        #map { width:1000px; height: 1000px; margin: auto; }
+    </style>
+</head>
+<body>
+<div id="map"></div>
+
+
+<script>
+
+    // defaults
+    var layers= 'flat,radar,admin';
+    var offset = 'current';
+    var lat = 40.58;
+    var lon = -101.33;
+    var zoom = 3.2;
+    var tilt = -0.19;
+    var heading = 0;
+    var accessKey = 'CLIENTIDHERE_CLIENTKEY'; //Your AMP access key
+
+
+    // allow hash to override  #layers/offset/lat/lon/zoom/tilt/heading
+    if (window.location.hash) {
+        var hashParts = window.location.hash.substr(1).split(/\//);
+        var numParts = hashParts.length;
+
+        if (numParts > 0) layers = hashParts[0];
+        if (numParts > 1) offset = hashParts[1];
+        if (numParts > 3) {
+            lat = hashParts[2];
+            lon = hashParts[3];
+        }
+        if (numParts > 4) zoom = hashParts[4];
+        if (numParts >= 6) tilt = hashParts[5];
+        if (numParts >= 7) heading = hashParts[6];
+    }
+
+    // lets create the map with default options
+    // See http://www.webglearth.org/api#TOC-WE.map-object for complete option list
+    var opts = {
+        sky: true,
+        atmosphere: true,
+        dragging: true,
+        tilting: true,
+        zooming: true,
+        center: [lat,lon],
+        zoom: zoom
+    };
+    map = new WE.map('map', opts);
+
+    // if we have a valid tilt and heading lets  set those
+    if (!isNaN(tilt)) map.setTilt(tilt);
+    if (!isNaN(heading)) map.setHeading(heading);
+
+    // add our map layer and time offset combination
+    WE.tileLayer('http://maps.aerisapi.com/' + accessKey + '/' + layers + '/{z}/{x}/{y}/' + offset + '.png', {
+        tileSize: 256,
+        minZoom: 0,
+        maxZoom: 16,
+        attribution: '<a href="http://www.aerisweather.com/">AerisWeather</a>',
+        subdomains: [1,2,3,4]
+
+    }).addTo(map);
+
+    // update the has on panning complete
+    map.on('mouseup', function() {
+        updateHash(map);
+    });
+
+    // update the hash on scroll where zooming finished
+    map.on('wheel', function() {
+        updateHash(map);
+    });
+
+
+    // lets update the hash
+    updateHash(map);
+
+
+    // this function is used to update the hash in the url
+    // in case you want to bookmark a view or copy/paste and share a url
+    function updateHash(map) {
+        var center = map.getCenter();
+
+        zoom = map.getZoom();
+        tilt = Math.round(map.getTilt() * 100)/100;
+        heading = Math.round(map.getHeading() * 100)/100;
+
+        var hash =  '#' + [layers,
+                    offset,
+                    Math.round(zoom * 1000)/1000,
+                    Math.round(center[0] * 1000) / 1000,
+                    Math.round(center[1] * 1000) / 1000,
+                    tilt,
+                    heading
+                ].join("/");
+
+        if(history.pushState) {
+            history.pushState(null, null, hash);
+        }
+        else {
+            location.hash = hash;
+        }
+    }
+
+</script>
+</body>
+</html>
