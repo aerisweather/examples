@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Example of using affects action with Aeris API Convective Endpoint</title>
+</head>
+<body>
+<h2>Example of using affects action with Convective/outlook endpoint</h2>
+<style>
+    .cities .type {
+        font-weight: bold;
+        font-size: 1.2em;
+        padding-top:10px;
+
+    }
+    .cities .city-list {
+        font-size: .9em;
+        padding: 2px;
+    }
+</style>
+<div class="cities"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
+
+    // url to fetch the current day convective outlooks
+    var convectiveSrcUrl = 'http://api.aerisapi.com/convective/outlook/search?filter=cat,day1&sort=code:-1&client_id=wgE96YE3scTQLKjnqiMsv&client_secret=DGCTq4z2xxttTBwTiimwlWyxmx5IDwK0VZ7T2WMS';
+
+    // url to fetch the cities affected by a convective outlook
+    var affectsSrcUrl = 'http://api.aerisapi.com/convective/outlook/affects?p={id}&limit=5&client_id=wgE96YE3scTQLKjnqiMsv&client_secret=DGCTq4z2xxttTBwTiimwlWyxmx5IDwK0VZ7T2WMS';
+
+    // start by fetching the convective outlooks
+    jQuery.getJSON(convectiveSrcUrl, function (data) {
+        data.response.forEach(function (outlook) {
+            var id = outlook.id;
+            var type = outlook.details.risk.name.replace(/\b\w/g, function(l){ return l.toUpperCase() });;
+
+            // insert the outlook id into the affects url
+            var url = affectsSrcUrl.replace('{id}', id);
+
+            // fetch the cities within the url
+            jQuery.getJSON(url, function (cities) {
+
+                // step through the cities and add to list
+                var citiesList = [];
+                cities.response.forEach(function(city) {
+                    // proper case the city and state
+                    var name = city.place.name.replace(/\b\w/g, function(l){ return l.toUpperCase() });
+                    name += ', ' + city.place.state.toUpperCase();
+                    citiesList.push(name);
+                });
+
+                // lets add the cities for this outlook category to the page
+                $('div.cities').append('<div class="type">' + type + "</div>" +
+                    '<div class="city-list">' + citiesList.join("<br/>\n") + '</div><br/>');
+
+            });
+        });
+    });
+
+
+</script>
+
+</body>
+</html>
