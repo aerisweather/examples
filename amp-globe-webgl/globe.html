@@ -98,9 +98,9 @@
 
         var hash =  '#' + [layers,
                     offset,
-                    Math.round(zoom * 1000)/1000,
                     Math.round(center[0] * 1000) / 1000,
                     Math.round(center[1] * 1000) / 1000,
+                    Math.round(zoom * 1000)/1000,
                     tilt,
                     heading
                 ].join("/");
@@ -112,6 +112,11 @@
             location.hash = hash;
         }
     }
+
+    // is user updates the hash in the address bar, lets update the map.
+    window.onhashchange = function () {
+        location.reload();
+    };
 
 </script>
 </body>
