@@ -18,16 +18,16 @@
         padding: 2px;
     }
 </style>
-<div class="cities"></div>
 
+<div class="cities"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script>
 
     // url to fetch the current day convective outlooks
-    var convectiveSrcUrl = 'http://api.aerisapi.com/convective/outlook/search?filter=cat,day1&sort=code:-1&client_id=wgE96YE3scTQLKjnqiMsv&client_secret=DGCTq4z2xxttTBwTiimwlWyxmx5IDwK0VZ7T2WMS';
+    var convectiveSrcUrl = 'http://api.aerisapi.com/convective/outlook/search?filter=cat,day1&sort=code:-1&client_id=CLIENTID&client_secret=CLIENTSECRET';
 
     // url to fetch the cities affected by a convective outlook
-    var affectsSrcUrl = 'http://api.aerisapi.com/convective/outlook/affects?p={id}&limit=5&client_id=wgE96YE3scTQLKjnqiMsv&client_secret=DGCTq4z2xxttTBwTiimwlWyxmx5IDwK0VZ7T2WMS';
+    var affectsSrcUrl = 'http://api.aerisapi.com/convective/outlook/affects?p={id}&limit=5&client_id=CLIENTID&client_secret=CLIENTSECRET';
 
     // start by fetching the convective outlooks
     jQuery.getJSON(convectiveSrcUrl, function (data) {
